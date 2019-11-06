@@ -7,13 +7,10 @@
 
 @foreach (var item in Model.wiredItems)
 {
-            <a asp-action="ExamById" asp-controller="Exam" asp-route-id="@item.wiredId">  <h1>@item.header</h1> </a>
-            @foreach (var paragraph in item.paragraph)
-            {
-                <p>@Html.Raw(paragraph)</p>
-
-            }
- 
+    <a asp-action="ExamCreate" asp-controller="Exam" asp-route-id="@item.wiredId">  <h1>@Html.Raw(item.header)</h1> </a>
+    @Html.Raw( item.paragraph)
    
+
+
 
 }

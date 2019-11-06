@@ -48,16 +48,22 @@ namespace ExamProject.Data
             return tags[0].InnerHtml;
         }
 
-        public IEnumerable<string> getParagraph(HtmlDocument document, string element)
+        public string getParagraph(HtmlDocument document, string element)
         {
-            List<string> paragraphs = new List<string>();
+            string paragraphs = "";
 
-            var paragrap = document.DocumentNode.SelectNodes("//" + element); //searches by p tag
-            foreach (var item in paragrap)
+            var paragraph = document.DocumentNode.SelectNodes("//" + element); //searches by p tag
+            var i = 0;
+            foreach (var item in paragraph)
             {
-                paragraphs.Add(item.InnerHtml);
+                if (i>4)
+                {
+                    break;
+                }
+                paragraphs+=item.InnerHtml;
+                i++;
             }
-            return paragraphs.Take(4).ToList();
+            return paragraphs;
         }
 
         public static wiredModel wiredModel { get; set; }

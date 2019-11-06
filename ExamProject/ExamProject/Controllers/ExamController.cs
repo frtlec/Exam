@@ -9,10 +9,12 @@ using System.Threading.Tasks;
 using ExamProject.Data;
 using ExamProject.Dtos;
 using HtmlAgilityPack;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ExamProject.Controllers
 {
+    [Authorize]
     public class ExamController : Controller
     {
         private IMyHtmlAgilityRepository _myHtmlAgilityRepository;
@@ -54,17 +56,23 @@ namespace ExamProject.Controllers
             return View(wiredModel);
         }
         [HttpGet]
-        public IActionResult ExamById(int id)
+        public IActionResult ExamCreate(int id)
         {
             wiredModel wiredModel = MyHtmlAgilityRepository.wiredModel;
             if (wiredModel!=null)
             {
                 var exam = wiredModel.wiredItems.Where(f => f.wiredId == id).FirstOrDefault();
-
-                return View(exam);
+                ViewBag.exam = exam;
+                ViewBag.id = id;
+                return View();
             }
             return RedirectToAction("Index");
 
+        }
+        [HttpPost]
+        public IActionResult ExamCreate([FromBody] ExamCreateModel createModel)
+        {
+            return Json(createModel);
         }
     }
   

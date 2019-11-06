@@ -76,7 +76,7 @@ namespace ExamProject
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Exam}/{action=Index}/{id?}");
+                    template: "{controller=Home}/{action=Index}/{id?}");
             });
         }
     }

@@ -21,7 +21,7 @@ namespace ExamProject.Dtos
         [Key]
         public int wiredId { get; set; }
         public string header { get; set; }
-        public IEnumerable<string> paragraph { get; set; }
+        public string paragraph { get; set; }
 
     }
 }

@@ -13,7 +13,7 @@ namespace ExamProject.Data
         HtmlDocument getDocument(string link);
         IEnumerable<string> getHrefs(HtmlDocument document,string ParentClassForA);
         string getHeaders(HtmlDocument document,string AttrID );
-        IEnumerable<string> getParagraph(HtmlDocument document, string element);
+        string getParagraph(HtmlDocument document, string element);
 
 
     }
