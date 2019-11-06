@@ -1,4 +1,5 @@
-﻿using HtmlAgilityPack;
+﻿using ExamProject.Dtos;
+using HtmlAgilityPack;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,7 @@ namespace ExamProject.Data
 {
     public class MyHtmlAgilityRepository : IMyHtmlAgilityRepository
     {
+
         public HtmlDocument getDocument(string link)
         {
             Uri url = new Uri(link);
@@ -23,7 +25,7 @@ namespace ExamProject.Data
             document.LoadHtml(html);
             return document;
         }
-        public List<string> getHrefs(HtmlDocument document, string ParentClassForA)
+        public IEnumerable<string> getHrefs(HtmlDocument document, string ParentClassForA)
         {
             var allElementsWithClass = document.DocumentNode.SelectNodes("//*[contains(@class,'" + ParentClassForA + "')]"); //searches by card-component__image class 
             List<string> hrefs = new List<string>();
@@ -36,7 +38,7 @@ namespace ExamProject.Data
                     hrefs.Add(href.Value);
                 }
             }
-            return hrefs;//return attr hrefs (string)
+            return hrefs.Take(5);//return attr hrefs (string)
         }
 
         public string getHeaders(HtmlDocument document, string element)
@@ -46,8 +48,18 @@ namespace ExamProject.Data
             return tags[0].InnerHtml;
         }
 
+        public IEnumerable<string> getParagraph(HtmlDocument document, string element)
+        {
+            List<string> paragraphs = new List<string>();
 
+            var paragrap = document.DocumentNode.SelectNodes("//" + element); //searches by p tag
+            foreach (var item in paragrap)
+            {
+                paragraphs.Add(item.InnerHtml);
+            }
+            return paragraphs.Take(4).ToList();
+        }
 
-
+        public static wiredModel wiredModel { get; set; }
     }
 }

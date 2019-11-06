@@ -26,28 +26,45 @@ namespace ExamProject.Controllers
             string link = "https://www.wired.com";  //link değişkenine çekeceğimiz web sayafasının linkini yazıyoruz.
             string htmlClass = "card-component__image";
             HtmlDocument documentHomePage = _myHtmlAgilityRepository.getDocument(link);
-            List<string> hrefs=_myHtmlAgilityRepository.getHrefs(documentHomePage, htmlClass);
+            IEnumerable<string> hrefs=_myHtmlAgilityRepository.getHrefs(documentHomePage, htmlClass);
 
             #region getPost
            
 
             wiredModel wiredModel = new wiredModel();
-            wiredItem wiredItem = new wiredItem();
+
             //going to posts
+            int i = 0;
             foreach (var item in hrefs)
             {
+                wiredItem wiredItem = new wiredItem();
                 HtmlDocument documentPost = _myHtmlAgilityRepository.getDocument(link+item);
+                wiredItem.wiredId = i;
                 wiredItem.header = _myHtmlAgilityRepository.getHeaders(documentPost, "h1");
-                wiredItem.article = "";
+                wiredItem.paragraph = _myHtmlAgilityRepository.getParagraph(documentPost,"p");
                 wiredModel.wiredItems.Add(wiredItem);
+                i++;
             }
             #endregion
 
 
+            MyHtmlAgilityRepository.wiredModel = wiredModel;
 
 
+            return View(wiredModel);
+        }
+        [HttpGet]
+        public IActionResult ExamById(int id)
+        {
+            wiredModel wiredModel = MyHtmlAgilityRepository.wiredModel;
+            if (wiredModel!=null)
+            {
+                var exam = wiredModel.wiredItems.Where(f => f.wiredId == id).FirstOrDefault();
 
-            return View();
+                return View(exam);
+            }
+            return RedirectToAction("Index");
+
         }
     }
   

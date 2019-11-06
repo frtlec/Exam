@@ -1,4 +1,5 @@
-﻿using HtmlAgilityPack;
+﻿using ExamProject.Dtos;
+using HtmlAgilityPack;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,8 +11,9 @@ namespace ExamProject.Data
     public interface IMyHtmlAgilityRepository
     {
         HtmlDocument getDocument(string link);
-        List<string> getHrefs(HtmlDocument document,string ParentClassForA);
+        IEnumerable<string> getHrefs(HtmlDocument document,string ParentClassForA);
         string getHeaders(HtmlDocument document,string AttrID );
+        IEnumerable<string> getParagraph(HtmlDocument document, string element);
 
 
     }

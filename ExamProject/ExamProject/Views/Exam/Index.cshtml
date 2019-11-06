@@ -1,7 +1,19 @@
-﻿
+﻿@model ExamProject.Dtos.wiredModel
 @{
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
 
+
+@foreach (var item in Model.wiredItems)
+{
+            <a asp-action="ExamById" asp-controller="Exam" asp-route-id="@item.wiredId">  <h1>@item.header</h1> </a>
+            @foreach (var paragraph in item.paragraph)
+            {
+                <p>@Html.Raw(paragraph)</p>
+
+            }
+ 
+   
+
+}
