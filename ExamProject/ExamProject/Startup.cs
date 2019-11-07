@@ -35,7 +35,7 @@ namespace ExamProject
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
             services.AddDbContext<examDBContext>(x=>x.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
-            //services.AddScoped<IAppRepository, AppRepository>();
+            services.AddScoped<IAppRepository, AppRepository>();
             services.AddScoped<IAuthRepository, AuthRepository>();
             services.AddScoped<IMyHtmlAgilityRepository, MyHtmlAgilityRepository>();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);

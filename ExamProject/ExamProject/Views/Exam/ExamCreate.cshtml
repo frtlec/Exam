@@ -125,6 +125,9 @@
             if (!result) {
                 return;
             }
+
+            console.log(JSON.stringify({ id: 1, header: $("#header").html(), paragraph: $("#paragraph").html(), questions: result }));
+
             $.ajax({
                 type: 'post',
                 url: '/Exam/ExamCreate',

@@ -8,20 +8,24 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using ExamProject.Data;
 using ExamProject.Dtos;
+using ExamProject.Models;
 using HtmlAgilityPack;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ExamProject.Controllers
 {
-    [Authorize]
+//[Authorize]
     public class ExamController : Controller
     {
         private IMyHtmlAgilityRepository _myHtmlAgilityRepository;
-       
-        public ExamController(IMyHtmlAgilityRepository myHtmlAgilityRepository)
+        private IAppRepository _appRepository;
+        private examDBContext _context;
+        public ExamController(IMyHtmlAgilityRepository myHtmlAgilityRepository,IAppRepository appRepository)
         {
             _myHtmlAgilityRepository = myHtmlAgilityRepository;
+            _appRepository = appRepository;
+            _context = new examDBContext();
         }
         public IActionResult Index()
         {
@@ -72,7 +76,63 @@ namespace ExamProject.Controllers
         [HttpPost]
         public IActionResult ExamCreate([FromBody] ExamCreateModel createModel)
         {
-            return Json(createModel);
+            string uniqueId = String.Format("{0:d9}", (DateTime.Now.Ticks / 10) % 1000000000);
+            Exams exams = new Exams
+            {
+                Header = createModel.header,
+                Paragraph = createModel.paragraph,
+                UniqueId= uniqueId
+            };
+
+       
+
+
+
+            try
+            {
+                _appRepository.Add(exams);
+                bool examsSave = _appRepository.SaveAll();
+                if (!examsSave)
+                {
+                    return Json(new { message = "error" });
+                }
+                var data = _context.Exams.Select(f => new { f.ExamId, f.UniqueId }).Where(f => f.UniqueId == uniqueId).FirstOrDefault();
+                var examId = data.ExamId;
+                ExamQuestions examQuestions = new ExamQuestions();
+                foreach (var item in createModel.questions)
+                {
+                    examQuestions.ExamId = examId;
+                    examQuestions.Answer = item.answer;
+                    if (item.options.Length==4)
+                    {
+                        return BadRequest("missing option");
+                    }
+                    examQuestions.OptionA = item.options[0];
+                    examQuestions.OptionB = item.options[1];
+                    examQuestions.OptionC = item.options[2];
+                    examQuestions.OptionD = item.options[3];
+                }
+                _appRepository.Add(examQuestions);
+                bool EquestionSave = _appRepository.SaveAll();
+                if (!EquestionSave)
+                {
+                    return Json(new { message = "error" });
+                }
+
+                //int id=_context.Exams.Where(f=>f.)
+
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(ex.Message);
+            }
+
+
+
+
+
+            return Json(new { x= exams ,y=createModel});
         }
     }
   

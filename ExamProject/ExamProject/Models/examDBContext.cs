@@ -15,19 +15,51 @@ namespace ExamProject.Models
         {
         }
 
+        public virtual DbSet<ExamQuestions> ExamQuestions { get; set; }
+        public virtual DbSet<Exams> Exams { get; set; }
         public virtual DbSet<Users> Users { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
             {
-              optionsBuilder.UseSqlite("DataSource=C:\\examDB.db");
+               optionsBuilder.UseSqlite("DataSource=C:\\db\\examDB.db");
             }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.3-servicing-35854");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
+
+            modelBuilder.Entity<ExamQuestions>(entity =>
+            {
+                entity.HasKey(e => e.QuestionId);
+
+                entity.Property(e => e.QuestionId).ValueGeneratedOnAdd();
+
+                entity.Property(e => e.Answer).IsRequired();
+
+                entity.Property(e => e.OptionA).IsRequired();
+
+                entity.Property(e => e.OptionB).IsRequired();
+
+                entity.Property(e => e.OptionC).IsRequired();
+
+                entity.Property(e => e.OptionD).IsRequired();
+            });
+
+            modelBuilder.Entity<Exams>(entity =>
+            {
+                entity.HasKey(e => e.ExamId);
+
+                entity.Property(e => e.ExamId).ValueGeneratedOnAdd();
+
+                entity.Property(e => e.Header).IsRequired();
+
+                entity.Property(e => e.Paragraph).IsRequired();
+
+                entity.Property(e => e.UniqueId).IsRequired();
+            });
 
             modelBuilder.Entity<Users>(entity =>
             {
@@ -38,7 +70,7 @@ namespace ExamProject.Models
 
                 entity.Property(e => e.UserId)
                     .HasColumnName("UserID")
-                    .ValueGeneratedNever();
+                    .ValueGeneratedOnAdd();
 
                 entity.Property(e => e.UserPassword).IsRequired();
 
