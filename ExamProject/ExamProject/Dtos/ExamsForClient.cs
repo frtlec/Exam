@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace ExamProject.Models
+namespace ExamProject.Dtos
 {
-    public partial class Exams
+    public class ExamsForClient
     {
         public long ExamId { get; set; }
         public string Header { get; set; }

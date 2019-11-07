@@ -66,6 +66,6 @@ namespace ExamProject.Data
             return paragraphs;
         }
 
-        public static wiredModel wiredModel { get; set; }
+        public static WiredModel wiredModel { get; set; }
     }
 }

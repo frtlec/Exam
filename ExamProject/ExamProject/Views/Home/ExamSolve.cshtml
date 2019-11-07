@@ -1,0 +1,171 @@
+﻿@model ExamProject.Dtos.ExamsForClient
+@{
+    ViewData["Title"] = "ExamSolve";
+}
+
+
+<style>
+    .notValid {
+        background-color: red;
+        color: white;
+    }
+    .notValid::-webkit-input-placeholder {
+            color: white;
+     }
+
+    #message {
+        display: none;
+    }
+
+    .hidden {
+        display: none;
+    }
+    .cursorPointer{
+        cursor:pointer;
+        transition:all .1s ease-in;
+    }
+    .selectedOption{
+       background: #00ffff9e;
+         color: black;
+    }
+    .falseAnswer{
+        background:red;
+    }
+    .trueAnswer{
+        background:green;
+    }
+    
+</style>
+
+
+<h2 id="header">@Html.Raw(ViewBag.Exam.Header)</h2>
+
+<p id="paragraph">@Html.Raw(ViewBag.Exam.Paragraph)</p>
+<span id="postId" class="hidden">@ViewBag.ExamId</span>
+<form class="container" id="examSolveForm">
+    <div class="row mt-5">
+        @{ var i = 0;}
+        @foreach (var item in ViewBag.Questions)
+        {
+        <div class="col-sm-6 mb-5" id="@i">
+            <div class="col-12 p-0">
+                <div class="form-group" >
+                    <h5 class="text-break">@((i + 1) + "." + item.Question)</h5>
+                </div>
+            </div>
+
+            <div class="col-sm-12 border mb-2">
+                <div class="row">
+                    <label class="col-sm-12 col-form-label text-break cursorPointer selectOption" data-answer="A" data-questionId="@item.QuestionId" data-index="@i">A) @item.OptionA</label>
+                </div>
+            </div>
+            <div class="col-sm-12 border mb-2 ">
+                <div class="row">
+                    <label class="col-sm-12 col-form-label text-break cursorPointer selectOption" data-answer="B"  data-questionId="@item.QuestionId" data-index="@i">B) @item.OptionB</label>
+                </div>
+            </div>
+
+            <div class="col-sm-12 border mb-2 ">
+                <div class="row">
+                    <label class="col-sm-12 col-form-label text-break cursorPointer selectOption" data-answer="C"  data-questionId="@item.QuestionId"  data-index="@i">C) @item.OptionC</label>
+                </div>
+            </div>
+            <div class="col-sm-12 border mb-2">
+                <div class="row cursorPointer">
+                    <label class="col-sm-12 col-form-label text-break cursorPointer selectOption" data-answer="D"  data-questionId="@item.QuestionId"  data-index="@i">D) @item.OptionD</label>
+                </div>
+            </div>
+           
+        </div>
+         
+            { i++; }
+        }
+
+    </div>
+    <div class="row">
+        <div class="col-sm-12 text-center">
+            <button type="submit" class="btn btn-success" id="submitBtn" disabled="true"> Solve </button>
+        </div>
+    </div>
+</form>
+
+
+@section Scripts{
+
+<script>
+     var array = [];
+    $(".selectOption").click(function () {
+        var idAttr = $(this).attr("data-index");
+        var questionId = $(this).attr("data-questionId");
+        var userAnswer = $(this).attr("data-answer");
+
+        $("#"+idAttr+" .selectedOption").removeClass("selectedOption");//class clear for an option
+        $(this).addClass("selectedOption");//adding class for clicked option
+        var obj = { QuestionId: questionId, UserAnswer: userAnswer }
+
+  
+            var isThere = array.filter(function (obj) {
+                return (obj.QuestionId == questionId);
+            });
+            if (isThere.length < 1) {
+                array.push(obj);
+            } else {
+                for (var i = 0; i < array.length; i++) {
+                    if ( array[i].QuestionId==questionId) {
+                       array[i].UserAnswer = userAnswer;
+                    }
+              
+                    
+                }
+            }
+      
+       
+
+        console.log(array);
+
+         
+        if (array.length >= 4) {
+            //Activate the button if all questions are answered
+            $("#submitBtn").prop('disabled', false);
+        }
+    });
+
+    $("#examSolveForm").submit(function (e) {
+        e.preventDefault();
+
+        //remove background color is form
+        $(".cursorPointer ").each(function (index, item) {
+            $(this).removeClass("falseAnswer");
+            $(this).removeClass("trueAnswer");
+        })
+
+
+        $.ajax({
+            url: '/home/ExamCompareAnswers',
+            type: 'post',
+            data: JSON.stringify(array),
+            dataType: 'json',
+             contentType: 'application/json',
+            success: function (data) {
+                console.log(data);
+                data.forEach(function (item) {
+                    console.log(item.correctAnswer  );
+                    if (item.correctAnswer) {
+                        $(".selectedOption[data-questionid='" + item.questionId + "']").addClass("trueAnswer");
+                    } else{
+                       $(".selectedOption[data-questionid='" + item.questionId + "']").addClass("falseAnswer");
+                    }
+                   
+                })
+                
+            },
+            error: function (err) {
+                console.log(err);
+            }
+
+        })
+    })
+</script>
+
+}
+

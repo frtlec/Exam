@@ -1,4 +1,4 @@
-﻿@model ExamProject.Dtos.wiredItem
+﻿
 @{
     ViewData["Title"] = "ExamByHeader";
 }
@@ -135,6 +135,9 @@
                 contentType: 'application/json',
                 success: function (data) {
                     console.log(data);
+                    if (data.ok) {
+                        location.href = "/";
+                    }
                 },
                 error: function (err) {
                     console.log(err);
@@ -171,26 +174,24 @@
                     $(questionSelector + i).addClass("notValid");
                     isValid = false;
                 }
-                obj.question = value;
 
+                //----
+                obj.question = value;
                 var valueAnswer = $(answer + i).val();
                 console.log(valueAnswer);
                 if (valueAnswer == "") {
-                    
-                      $(answer + i).addClass("notValid");
+                    $(answer + i).addClass("notValid");
                     isValid = false;
                 }
                  obj.answer = valueAnswer;
                 for (var k = 1; k <=4; k++) {
                     var fullSelectorForOptions = optionsSelector + i + optionsSelectorEx[k - 1];
                     var value = $(fullSelectorForOptions).val();
-               
                     if (value == "") {
                         $(fullSelectorForOptions).addClass("notValid");
                         isValid = false;
                     }
                     obj.options.push(value);
-
                 }
                 array.push(obj);
             }

@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace ExamProject.Models
+namespace ExamProject.Dtos
 {
-    public partial class ExamQuestions
+    public class ExamsQuestionsForClient
     {
         public long QuestionId { get; set; }
         public string OptionA { get; set; }
@@ -11,7 +13,6 @@ namespace ExamProject.Models
         public string OptionC { get; set; }
         public string OptionD { get; set; }
         public string Question { get; set; }
-        public string Answer { get; set; }
         public long? ExamId { get; set; }
     }
 }

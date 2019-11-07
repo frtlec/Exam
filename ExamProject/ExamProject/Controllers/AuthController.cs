@@ -47,7 +47,7 @@ namespace ExamProject.Controllers
              await HttpContext.SignInAsync(principal);
 
                 //Just redirect to our index after logging in. 
-            return RedirectToAction("Index", "Exam");
+            return RedirectToAction("Index", "Home");
            
         }
 

@@ -46,6 +46,7 @@ namespace ExamProject.Models
                 entity.Property(e => e.OptionC).IsRequired();
 
                 entity.Property(e => e.OptionD).IsRequired();
+                entity.Property(e => e.Question);
             });
 
             modelBuilder.Entity<Exams>(entity =>
@@ -59,6 +60,7 @@ namespace ExamProject.Models
                 entity.Property(e => e.Paragraph).IsRequired();
 
                 entity.Property(e => e.UniqueId).IsRequired();
+                entity.Property(e => e.CreationDate);
             });
 
             modelBuilder.Entity<Users>(entity =>

@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace ExamProject.Dtos
 {
-    public class wiredModel
+    public class WiredModel
     {
-        public wiredModel()
+        public WiredModel()
         {
             wiredItems = new List<wiredItem>();
         }
@@ -16,8 +16,6 @@ namespace ExamProject.Dtos
     }
     public class wiredItem
     {
-     
-
         [Key]
         public int wiredId { get; set; }
         public string header { get; set; }
