@@ -1,34 +1,251 @@
-﻿@model ExamProject.Dtos.WiredModel
+﻿
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "ExamByHeader";
 }
 
 <style>
-    .row{
-        color:black;
-        margin-bottom:25px;
-        background-color:#eaeaea;
-        padding:20px 0;
+    .notValid {
+        background-color: red;
+        color: white;
     }
 
+        .notValid::-webkit-input-placeholder {
+            color: white;
+        }
+
+    #message {
+        display: none;
+    }
+
+    .hidden {
+        display: none;
+    }
+    .paragraphDiv{
+        height:350px;
+        width:100%;
+        overflow-x:hidden;
+        overflow-y:scroll;
+
+    }
 </style>
 
+       
 
-@foreach (var item in Model.wiredItems)
-{
-   
-   
+<form class="container" id="examCreateForm">
 
-   
-        <a class="row" asp-action="ExamCreate" asp-controller="Exam" asp-route-id="@item.wiredId">
+    <div class="row">
 
-            <div class="col-sm-11">
-                <h3>@Html.Raw(item.header)</h3>
+        <div class="col-12">
+            <div class="form-group" >
+                <select class="form-control" id="header">
+                    @foreach (var item in  ViewBag.option)
+                    {   
+                        <option value="@item.header" data-link="@item.href">@item.header</option>
+                    }
+                </select>
             </div>
-            <div class="col-sm-2">
-                <i class="glyphicon glyphicon-chevron-right"></i>
-            </div>
-        </a>
-   
+        </div>
+        <div class="col-12 paragraphDiv border" id="paragraph">
 
+        </div>
+
+        @for (int i = 1; i <= 4; i++)
+            {
+        <div class="col-12">
+            <h3 class="text-center" style="margin:50px 0 30px 0;padding:10px 0; background:#d6d6d6;">@i. question</h3>
+        </div>
+        <div class="col-12">
+            <div class="form-group" onclick="clear(this)">
+                <input type="text" class="form-control" id="question-@i" name="@("question"+i)" placeholder="@i. question">
+            </div>
+        </div>
+
+        <div class="col-sm-6">
+            <div class="form-group row">
+                <label for="@("option"+i+"A")" class="col-sm-1 col-form-label">A)</label>
+                <div class="col-sm-11 pl-0">
+                    <input type="text" class="form-control" id="@("option"+i+"A")" name="@("option"+i+"A")" placeholder="answer the question" />
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="form-group row">
+                <label for="@("option"+i+"B")" class="col-sm-1 col-form-label">B)</label>
+                <div class="col-sm-11 pl-0">
+                    <input type="text" class="form-control" id="@("option"+i+"B")" name="@("option"+i+"B")" placeholder="answer the question" />
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6">
+            <div class="form-group row">
+                <label for="@("option"+i+"C")" class="col-sm-1 col-form-label">C)</label>
+                <div class="col-sm-11 pl-0">
+                    <input type="text" class="form-control" id="@("option"+i+"C")" name="@("option"+i+"C")" placeholder="answer the question" />
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="form-group row">
+                <label for="@("option"+i+"D")" class="col-sm-1 col-form-label">D)</label>
+                <div class="col-sm-11 pl-0">
+                    <input type="text" class="form-control" id="@("option"+i+"D")" name="@("option"+i+"D")" placeholder="answer the question" />
+                </div>
+            </div>
+        </div>
+        <div class="d-flex flex-fill  justify-content-center">
+            <div class="col-sm-6">
+                <select class="form-control" id="answer-@i">
+                    <option value="" selected>Choose the right answer</option>
+                    <option value="A">A Correct answer</option>
+                    <option value="B">B Correct answer</option>
+                    <option value="C">C Correct answer</option>
+                    <option value="D">D Correct answer</option>
+                </select>
+            </div>
+
+        </div>
+
+
+
+
+            }
+    </div>
+
+
+
+    <div class="row mt-5">
+
+
+        <div class="col-sm-12 text-center">
+            <button type="submit" class="btn btn-success"> Create Quiz </button>
+        </div>
+
+        <div class="col-sm-12 text-center mt-3" id="message">
+            <div class="alert alert-danger" role="alert">
+                cannot be left empty
+            </div>
+        </div>
+
+    </div>
+
+
+
+</form>
+
+
+
+
+
+
+
+
+@section Scripts{
+    <script>
+        $(window).ready(function () {
+            $("#header").prop("selectedIndex", 0).change();//for default option 
+        })
+        $("#header").change(function (e) {
+            var element=$(this).find('option:selected');
+            var hrefx = element.attr("data-link"); 
+            $.ajax({
+                url: '/Exam/GetWiredPostParagraph',
+                type: 'post',
+                contentType: 'application/json',
+                data: JSON.stringify({href:hrefx }),
+                success: function (data) {
+                    $("#paragraph").html(data);
+                },
+                error: function (err) {
+                     console.log(err);
+                }
+
+            })
+
+        });
+
+        $("#examCreateForm").submit(function (e) {
+            e.preventDefault();
+            var result=validation();
+            if (!result) {
+                return;
+            }
+            $.ajax({
+                type: 'post',
+                url: '/Exam/ExamCreate',
+                data: JSON.stringify({ id: 1, header: $("#header").val(), paragraph: $("#paragraph").html(), questions: result }),
+                contentType: 'application/json',
+                success: function (data) {
+                    console.log(data);
+                    if (data.ok) {
+                        location.href = "/";
+                    }
+                },
+                error: function (err) {
+                    console.log(err);
+                }
+
+
+            })
+
+        });
+
+         $("input , select").change(function () {
+            $(this).removeClass('notValid');
+         })
+
+        function validation() {
+
+
+            var elems = document.querySelectorAll(".notValid");
+
+            [].forEach.call(elems, function(el) {
+                el.classList.remove("notValid");
+            });
+
+            var array = [];
+            var isValid = true;
+            var questionSelector = "#question-";
+            var optionsSelector = "#option";
+            var optionsSelectorEx = ['A', 'B', 'C', 'D'];
+            var answer="#answer-"
+            for (var i = 1; i <= 4; i++) {
+                var obj = { question: "", options:[],answer };
+                var value = $(questionSelector + i).val();
+                if (value == "") {
+                    $(questionSelector + i).addClass("notValid");
+                    isValid = false;
+                }
+                //----
+                obj.question = value;
+                var valueAnswer = $(answer + i).val();
+                console.log(valueAnswer);
+                if (valueAnswer == "") {
+                    $(answer + i).addClass("notValid");
+                    isValid = false;
+                }
+                 obj.answer = valueAnswer;
+                for (var k = 1; k <=4; k++) {
+                    var fullSelectorForOptions = optionsSelector + i + optionsSelectorEx[k - 1];
+                    var value = $(fullSelectorForOptions).val();
+                    if (value == "") {
+                        $(fullSelectorForOptions).addClass("notValid");
+                        isValid = false;
+                    }
+                    obj.options.push(value);
+                }
+                array.push(obj);
+            }
+             console.log(array);
+            if (!isValid) {
+                $("#message").show();
+                return false;
+            }
+
+            return array;
+        }
+
+
+
+    </script>
 }

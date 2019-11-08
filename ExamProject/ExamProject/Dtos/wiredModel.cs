@@ -22,4 +22,10 @@ namespace ExamProject.Dtos
         public string paragraph { get; set; }
 
     }
+
+    public class WiredLink: wiredItem
+    {
+        public string href { get; set; }
+    }
+
 }

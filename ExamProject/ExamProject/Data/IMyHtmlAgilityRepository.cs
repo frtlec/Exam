@@ -11,7 +11,7 @@ namespace ExamProject.Data
     public interface IMyHtmlAgilityRepository
     {
         HtmlDocument getDocument(string link);
-        IEnumerable<string> getHrefs(HtmlDocument document,string ParentClassForA);
+        IEnumerable<WiredLink> getHrefs(HtmlDocument document,string ParentClassForA);
         string getHeaders(HtmlDocument document,string AttrID );
         string getParagraph(HtmlDocument document, string element);
 

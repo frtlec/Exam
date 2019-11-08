@@ -21,6 +21,7 @@ namespace ExamProject.Controllers
         private IMyHtmlAgilityRepository _myHtmlAgilityRepository;
         private IAppRepository _appRepository;
         private examDBContext _context;
+        private string link= "https://www.wired.com"; //Website link
         public ExamController(IMyHtmlAgilityRepository myHtmlAgilityRepository,IAppRepository appRepository)
         {
             _myHtmlAgilityRepository = myHtmlAgilityRepository;
@@ -29,53 +30,22 @@ namespace ExamProject.Controllers
         }
         public IActionResult Index()
         {
-            string link = "https://www.wired.com"; //Website link
-            string htmlClass = "card-component__image";//we are looking for members of this class in the document
+            string htmlClass = "card-component__description";//we are looking for members of this class in the document
             HtmlDocument documentHomePage = _myHtmlAgilityRepository.getDocument(link);
-            IEnumerable<string> hrefs=_myHtmlAgilityRepository.getHrefs(documentHomePage, htmlClass);//collecting links for last 5 posts
-
-            #region getPost
-
-
-            WiredModel wiredModel = new WiredModel();
-
-           
-
-            int i = 0;
-            foreach (var item in hrefs)
-            {
-                //Will return once for each shipment
-                //
-                wiredItem wiredItem = new wiredItem();
-                HtmlDocument documentPost = _myHtmlAgilityRepository.getDocument(link+item);//source codes are downloaded using HtmlAgilityPack
-                wiredItem.wiredId = i;
-                wiredItem.header = _myHtmlAgilityRepository.getHeaders(documentPost, "h1");
-                wiredItem.paragraph = _myHtmlAgilityRepository.getParagraph(documentPost,"p");
-                wiredModel.wiredItems.Add(wiredItem);  //Find  <h1> and <p> elements of posts
-                i++;
-            }
-            #endregion
-
-
-            MyHtmlAgilityRepository.wiredModel = wiredModel;
-
-
-            return View(wiredModel);
+            IEnumerable<WiredLink> wiredLinks=_myHtmlAgilityRepository.getHrefs(documentHomePage, htmlClass);//collecting links for last 5 posts
+            ViewBag.option = wiredLinks;
+            return View();
         }
-        [HttpGet]
-        public IActionResult ExamCreate(int id)
+
+        [HttpPost]
+        public IActionResult GetWiredPostParagraph([FromBody]WiredLink wiredLink)
         {
-            WiredModel wiredModel = MyHtmlAgilityRepository.wiredModel;
-            if (wiredModel!=null)
-            {
-                var exam = wiredModel.wiredItems.Where(f => f.wiredId == id).FirstOrDefault();
-                ViewBag.exam = exam;
-                ViewBag.id = id;
-                return View();
-            }
-            return RedirectToAction("Index");
-
+            HtmlDocument documentPost = _myHtmlAgilityRepository.getDocument(link + wiredLink.href);//source codes are downloaded using HtmlAgilityPack
+            string paragraph = _myHtmlAgilityRepository.getParagraph(documentPost, "p");
+            return Json(paragraph);
         }
+
+     
         [HttpPost]
         public IActionResult ExamCreate([FromBody] ExamCreateModel createModel)
         {
@@ -116,7 +86,6 @@ namespace ExamProject.Controllers
                     if (item.options.Length!=4)
                     {
                         //If item.option.length is not equal to four. error
-
                         return BadRequest("missing option");
                     }
                     examQuestions.OptionA = item.options[0];

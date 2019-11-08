@@ -25,20 +25,32 @@ namespace ExamProject.Data
             document.LoadHtml(html);
             return document;
         }
-        public IEnumerable<string> getHrefs(HtmlDocument document, string ParentClassForA)
+        public IEnumerable<WiredLink> getHrefs(HtmlDocument document, string ParentClassForA)
         {
             var allElementsWithClass = document.DocumentNode.SelectNodes("//*[contains(@class,'" + ParentClassForA + "')]"); //searches by card-component__image class 
-            List<string> hrefs = new List<string>();
+            List<WiredLink> hrefs = new List<WiredLink>();
             foreach (var item in allElementsWithClass)
             {
                 var nodesForhref = item.SelectNodes("a");//searches by a tag
+                var i = 0;
                 foreach (var node in nodesForhref)
                 {
-                    var href = node.Attributes.Where(f => f.Name == "href").FirstOrDefault();//searches by Href attribute
-                    hrefs.Add(href.Value);
+                    if (i%2==1)
+                    {
+                        WiredLink wiredLink = new WiredLink();
+                        var href = node.Attributes.Where(f => f.Name == "href").FirstOrDefault();//searches by Href attribute
+                        var h2 = node.FirstChild;
+                        wiredLink.href = href.Value;
+                        wiredLink.header = h2.InnerText;
+                        hrefs.Add(wiredLink);
+                    }
+               
+                    i++;
+
                 }
             }
-            return hrefs.Take(5);//return attr hrefs (string)
+            var x= hrefs.Take(5); 
+            return x;//return attr hrefs (string)
         }
 
         public string getHeaders(HtmlDocument document, string element)
